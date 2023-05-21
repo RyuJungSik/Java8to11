@@ -92,6 +92,8 @@ fabric.properties
 ### Java ###
 # Compiled class file
 *.class
+.idea
+out/*
 
 # Log file
 *.log
