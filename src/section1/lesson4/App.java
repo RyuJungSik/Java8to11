@@ -13,7 +13,7 @@ public static void main(String[] args) {
     
     
     UnaryOperator<String> hi = (s) -> "hi" + s;
-
+    
     //    메소드 레퍼런스 사용 스태틱 메소드
     UnaryOperator<String> hi2 = Greeting::hi;
     
@@ -28,9 +28,9 @@ public static void main(String[] args) {
     Supplier<Greeting> newGreeting = Greeting::new;
     Greeting greeting1 = newGreeting.get();
     
-    //입력값을 받는 생성자
-    Function<String, Greeting> kimGreeting = Greeting::new;
-    Greeting kim = kimGreeting.apply("chulsu");
+        //입력값을 받는 생성자
+        Function<String, Greeting> kimGreeting = Greeting::new;
+        Greeting kim = kimGreeting.apply("chulsu");
     System.out.println(kim.getName());
     
     //임의이 갯수 인스턴스 참조
