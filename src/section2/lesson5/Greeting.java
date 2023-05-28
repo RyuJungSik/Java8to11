@@ -1,4 +1,4 @@
-package section1.lesson4;
+package section2.lesson5;
 
 public class Greeting {
 
