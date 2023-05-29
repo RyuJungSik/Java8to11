@@ -222,3 +222,68 @@ System.out.println(runSomething2.doIt(1));
     ```java
     Arrays.sort(names, String::compareToIgnoreCase);
     ```
+
+## 인터페이스의 변화
+
+## 인터페이스 기본 메소드와 스태틱 메소드
+
+- **디폴트 메소드**
+
+    ```java
+    public interface Foo {
+    default void printNameUppserCase(){
+     System.out.println(getName().toUpperCase());
+    };
+    }
+    ```
+
+  - 인터페이스에 메소드 추가 시 해당 인터페이스를 구현받는 모든 클래스는 메소드를 오버라이드 해야한다.
+  - 디폴트 메소드추가 시 구현한 클래스 변경없이 새 기능을 추가할 수 있다.
+  - 디폴트 메소드 추가 시 @implSpec를 통해 문서화 필요하다.
+  - 인터페이스를 상속받는 인터페이스에서 다시 추상메소드로 변경할 수 있다.
+  - 인터페이스의 디폴트 메소드를 구현받는 클래스에서 오버라이드로 재정의도 가능하다.
+- **스태틱 메소드**
+  - 해당 타입 관련 헬퍼 또는 유틸리티 메소드를 제공할때 인터페이스에 스태틱 메소드를 제공할 수 있다.
+
+    ```java
+    public interface Foo {
+    static void printAnything() {
+     System.out.println("Foo");
+    }
+    }
+    ```
+
+
+### 자바8 API의 기본 메소드와 스태틱 메소드
+
+- 자바8의 API의 **주요 디폴트 메소드**
+  - literable 인터페이스의 디폴트 메소드
+    - forEach() → 각각의 엘리먼트들을 차례로 순회가능하다.
+    - spliterator() → 리스트를 나눠서 탐색하는 디폴트 메서드이다.
+  - Colloection 인터페이스의 디폴트 메소드
+    - stream() → 엘리먼트들을 스트림으로 변환해서 함수적으로 처리가능하다
+
+      ```java
+      long k = name.stream().map(String::toUpperCase).filter(s -> s.startsWith("K")).count();
+      ```
+
+    - removeIf(Predicate) → 조건에 맞는 값을 제거한다.
+  - Comparator 인터페이스의 디폴트 메소드
+    - sort(Comparator)에서 자주 사용됨
+      - reversed(), thenComparing()
+
+        ```java
+        name.sort(compareToIgnoreCase.reversed());
+        ```
+
+  - Comparator 인터페이스의 스태틱 메소드
+    - static reverseOrder()
+    - static naturalOrder()
+    - static nullFirst()
+    - static nullLast()
+    - static comparing()
+- 인터페이스 디폴트 메소드와 스태틱메소드 제공의 장점
+  - 기존 → 인터페이스에 추상 클래스를 구현받고, 그 클래스를 상속받는 클래스를 만드는 구조
+  - 현재 → 구현한 추상클래스 없이 바로 인터페이스에 디폴트 메소드 만들고 바로 그 인터페이스를 구현하는 클래스 만듬
+  - 기존은 상속을 받으면 다른 클래스에 상속을 중복으로 받지 못한다.
+  - 현재는 인터페이스의 구현을 받고 상속도 자유롭다.
