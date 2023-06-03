@@ -220,7 +220,7 @@ System.out.println(runSomething2.doIt(1));
 - **임의 객체의 인스턴스 메소드 참조**
 
     ```java
-    Arrays.sort(names, String::compareToIgnoreCase);
+    Arrays.sort(, String::compareToIgnoreCase);
     ```
 
 ## 인터페이스의 변화
