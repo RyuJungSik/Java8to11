@@ -457,3 +457,63 @@ System.out.println(runSomething2.doIt(1));
     ```
 
 - Optional.filter(Predicate) → 안에 들어있는 값을 걸러내서 Optional을 리턴한다.
+
+## 6. Date와 Time API
+
+### Date와 Time API 소개
+
+- **자바8 이전의 날짜 시간 API는 다소 불편한게 많았다.**
+  - java.util.Date클래스는 mutable하기 때문에 thread safe하지 않다.
+  - Date클래스인데 시간까지 다룬다.
+  - 버그 발생 여지가 많다.  → 타입 안정성, 월 시작 숫자
+- 자바8 이후 새롭게 Date-Time API를 제공한다.
+- **자바8 Date-Time의 특징은**
+  - 기계 시간과 인간 시간을 나눈다.
+  - 기계 시간은 1970년부터 현재까지의 타임스탬프를 표현한다.
+  - 인간 시간은 년원일시분초로 표현한다.
+  - 타임스탬프는 Instant를 사용한다.
+  - 특정날짜 - LocalDatem, 특정 시간 - LocalTime, 특정일시 - LocalDateTime를 사용한다.
+  - 기간 표현시 Duration- 시간 기반, Period - 날짜 기반을 사용한다.
+  - DateTimeFormatter를 사용해서 일시를 특정한 문자열로 포매팅할 수 있다.
+
+### Date와 Time API
+
+- 현재를 기계 시간으로 표현하는법
+  - java.time.Instant의 API를 사용한다. Instant.now() → 기준시를 나타낸다.
+  - Instant.atZone()을 통해 기준 지역을 설정가능하다.
+
+    ```java
+    ZoneId zone = ZoneId.systemDefault();
+    ZonedDateTime zonedDateTime = instant.atZone(zone);
+    System.out.println("zonedDateTime = " + zonedDateTime);
+    ```
+
+- 현재를 인간 시간으로 표현하는법
+  - LocalDateTime.now() → 현재 지역에 해당하는 일시를 리턴한다.
+  - ZoneDateTime.now(특정 존) → 특정 존의 현재시간을 알 수 있다.
+- 기간을 표현하는 방법 →
+  - Period (사람 시간용)→ Period.between(today, 특정날) 을통해서 기간을 알  수 있다.
+  - Duration(기  간시용간)  → Duration.between(now, plus)을 통해서 기간을 알 수 있다.
+- 포매팅 기능
+  - LocalDateTime 의 포맷팅 → DateTimeFomatter으로 포맷을 지정하고 format 함수로 설정할 수 있다.
+
+    ```java
+    LocalDateTime now3 = LocalDateTime.now();
+    DateTimeFormatter MMddyyyy = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+    System.out.println("now.format(MMddyyyy) = " + now.format(MMddyyyy));
+    ```
+
+- 파싱 기능
+  - LocalDate.parse(날자, 포맷)으로 원하는 포맷으로 파싱이 가능하다.
+
+    ```java
+    LocalDate parse = LocalDate.parse("07/15/1982", MMddyyyy);
+    System.out.println("parse = " + parse);
+    ```
+
+- 레거시 API지원
+  - date.toInstant()로 레거시 Date타입을 Instant 타입으로 변경할 수 있다.
+  - Date.from(instant)로 Instant타입을 Date로 변경가능하다.
+  - GregorianCalendar.toInstant().atZone()로 ZonedDateTime으로 변겨이 가능하고
+  - GregorianCalendar.toInstant().atZone().toLocalDateTime()로 LocalDateTime 타입으로 변경이 가능하다.
+  - GregorianCalendar.from(ZoneDateTime)으로 ZoneDateTime에서 레거시 GregorianCalendar타입으로변경 가능하다.
