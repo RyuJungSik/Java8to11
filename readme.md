@@ -386,3 +386,74 @@ System.out.println(runSomething2.doIt(1));
 
 - 개수 세기 → count()
 - 데이터 하나로 합치기 → reduce(), collection(), sum(), max()
+
+## 4. Optional
+
+### Optional 소개
+
+- **기존 null을 처리하는 방법**
+  - if 문으로 일일히 null을 체크해줬다.
+  - 하지만 체크를 잊을 시 NullPointerException을 발생시킨다.
+- **메소드 작업중 상황에 따라 값을 제대로 리턴할 수 없는 경우 가능한 방법**
+  - 예외를 던진다.
+  - null을 리턴한다 → 사용시 유의해야 한다.
+  - Optional을 리턴한다.
+- **Optional이란?**
+  - 오직 값 한개가 들어있을 수도 없을 수도 있는 컨테이너.
+  - null 처리에 유리하다.
+- **Optional 사용법**
+  - 리턴값으로만 사용해야한다.
+  - 프리미티브 타입용 Optional이 있다. OptionalInt, OptionalLong
+  - Collection, Map, Stream Array, Optional은 Opiontal로 감싸지 말아야한다.
+
+### Optional API
+
+- **Optional은 Optional.of(),  Optional.ofNullable(), Optional.empty()로 생성가능하다.**
+
+    ```java
+    public Optional<Progress> getProgress() {
+        
+        //ofNullable은 널일수 있다.
+        //Of 면 null일 수 없다. 널일 시 예외 발생시킴
+        return Optional.ofNullable(progress);
+    }
+    ```
+
+- **Stream()의 API인 findFirst() 등을 통해서 Optional을 리턴 받을 수 있다.**
+
+    ```java
+    Optional<OnlineClass> spring = 
+    springClasses.stream()
+    .filter(oc -> oc.getTitle().startsWith("spring"))
+    .findFirst();
+    ```
+
+- **Optional에 값이 있는지 없는지 확인기능**
+  - isPresent(), isEmpty()
+
+    ```java
+    //isPresent로 있는지 없는지 검사할 수 있다.
+    boolean present = spring.isPresent();
+    System.out.println("present = " + present);
+    
+    //없는 경우 false 를 반환한다.
+    boolean present2 = jpa.isPresent();
+    System.out.println("present2 = " + present2);
+    
+    //IsEmpty도 가능하다 IsPresent 의 반대
+    boolean empty = jpa.isEmpty();
+    System.out.println("empty = " + empty);
+    ```
+
+- **Optional에 있는 값 가져오기**
+  - get() → 값을 가져오고 nul이면 예외를 발생시킨다.
+  - orElse(T) → 값이 있으면 값을 가져오고 없으면 매개변수 값을 리턴한다.
+  - orElseGet(Supplier) → 값이 있으면 가져오고 없으면 ~~를 하라 이다.
+  - orElseThrow → 값이 있으면 가져오고 없는 경우 에러를 던진다.
+- **ifPresent() → 값이 있는경우 해당 값으로 ~~ 를 하라**
+
+    ```java
+    spring.ifPresent(oc -> System.out.println(oc.getTitle()));
+    ```
+
+- Optional.filter(Predicate) → 안에 들어있는 값을 걸러내서 Optional을 리턴한다.
