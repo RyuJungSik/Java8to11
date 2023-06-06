@@ -757,3 +757,35 @@ System.out.println(runSomething2.doIt(1));
       return result;
     });
     ```
+
+## 그외
+
+### 애노테이션의 변화
+
+- 자바8 이후 어노테이션 변화
+  - 어노테이션을 타입 선언부에도 사용할 수 있다.
+  - 어노테이션을 중복해서 사용할 수 있게 됐다.
+- 타입 선언부의 종류는?
+  - 제네릭 타입
+  - 변수 타입
+  - 매개변수 타입
+  - 예외 타입
+- 어노테이션 선언시 Target
+  - TYPE_PARAMETER → 타입 변수에만 사용할 수 있다.
+  - TYPE_USE → 타입 변수를 포함해서 모든 타입 선언부에 사용할 수 있다.
+
+### 배열 Parallel 정렬
+
+- Arrays.parallelSort() → Fork / Join 프레임워크를 사용해서 배열을 병렬로 정렬하는 기능을 제공한다.
+- 병렬 정렬 알고리즘 원리
+  - 배열을 둘로 계속 쪼갠다.
+  - 합치면서 정렬한다.
+
+```java
+int[] numbers = new int[size];
+Arrays.parallelSort(numbers);
+```
+
+- 알고리즘 호율성은 같다.
+  - 시간 복잡도 → O(nlogN)
+  - 공간 복잡도 → O(n)
