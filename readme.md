@@ -458,7 +458,7 @@ System.out.println(runSomething2.doIt(1));
 
 - Optional.filter(Predicate) → 안에 들어있는 값을 걸러내서 Optional을 리턴한다.
 
-## 6. Date와 Time API
+## 5. Date와 Time API
 
 ### Date와 Time API 소개
 
@@ -517,3 +517,243 @@ System.out.println(runSomething2.doIt(1));
   - GregorianCalendar.toInstant().atZone()로 ZonedDateTime으로 변겨이 가능하고
   - GregorianCalendar.toInstant().atZone().toLocalDateTime()로 LocalDateTime 타입으로 변경이 가능하다.
   - GregorianCalendar.from(ZoneDateTime)으로 ZoneDateTime에서 레거시 GregorianCalendar타입으로변경 가능하다.
+
+## 6. CompletableFuture
+
+### 자바 Concurrent 프로그래밍 소개
+
+- 자바는 멀티쓰레드를 통해서 Concurrent 프로그래밍을 할 수 있다.
+- 멀티 쓰레드 구현방법
+  - Thread 상속
+
+    ```java
+    static class MyThread extends Thread {
+        @Override
+        public void run() {
+            System.out.println("Thread = " + Thread.currentThread().getName());
+        }
+    }
+    
+    MyThread myThread = new MyThread();
+    myThread.start();
+    ```
+
+  - Runnable 구현 또는 람다
+
+    ```java
+    Thread thread2 = new Thread(new Runnable() {
+      @Override
+      public void run() {
+          System.out.println("Thread = " + Thread.currentThread().getName());
+      }
+    });
+    
+    //람다
+    Thread thread = new Thread(() -> {
+      try {
+          Thread.sleep(3000L);
+      } catch (InterruptedException e) {
+          throw new IllegalStateException(e);
+      }
+    System.out.println("Thread = " + Thread.currentThread().getName());        
+    });
+    ```
+
+- 쓰레드 주요 기능
+  - sleep() → 현재 쓰레드를 멈춘다. 다른 쓰레드가 처리할 수 있도록 기회를 준다.
+  - interrupt() → 다른 쓰레드를 깨워서 `InterruptedException` 을 발생시킨다.
+  - join() → 다른 쓰레드가 끝날 때까지 기다린다.
+
+### Executor
+
+- Executors는 쓰레드를 만들고 관리하는 작업을 도와주는 API이다.
+- Executors 하는 일
+  - 쓰레드 생성 → 애플리케이션이 사용할 쓰레드 풀을 만들어 관리한다.
+  - 쓰레드 관리 → 쓰레드 생명주기를 관리한다.
+  - 작업 처리 및 실행 → 쓰레드로 실행할 작업을 제공할 수 있는 API를 제공한다.
+- Executors의 주요 인터페이스
+  - Executors → execute(Runnable) 하나로 구성된 인터페이스
+  - ExecutorService → Callable도 실행할 수 있으며, Executor을 종료 시키거나, 여러 Callable을 동시에 실행하는 등의 기능을 제공한다.
+  - ScheduledExecutorService → ExecutorService를 상속 받은 인터페이스로 특정 시간 이후에 또는 주기적으로 작업을 실행할 수 있다.
+- Executors는 스레드 풀을 생성가능하다.
+  - newSingleThreadExecutor()
+  - newFixedThreadPool()
+
+    ```java
+    ExecutorService executorService = Executors.newSingleThreadExecutor();
+    ExecutorService executorService = Executors.newFixedThreadPool(4);
+    ```
+
+- submit로 스레드 작업 실행 가능하다.
+
+    ```java
+    executorService.submit(() -> {
+        System.out.println("Hello :" + Thread.currentThread().getName());
+    });
+    ```
+
+- newSingleThreadScheduledExecutor()를 통해서 반복적으로 실행되는 스레드를 만들 수 있다.
+- shutdown(), shutdownNow()으로 스레드 종료 가능하다.
+
+## Callable과 Future
+
+- Callable란 → Runnable과 유사하지만 작업의 결과를 return 받을 수 있다.
+- Future란 → 비동기적인 작업의 현재 상태를 조회하거나 결과를 가져올 수 있다.
+
+    ```java
+    Callable<String> hello = () -> {
+            Thread.sleep(2000L);
+            return "Hello";
+        };
+    
+    Future<String> helloFuture = executorService.submit(hello);
+    ```
+
+- F**uture.get()**
+  - get()을 통해서 Callabel의 값을 가져올 수 있다.
+  - get()은 블록킹 콜이다. → 스레드가 완료될때까지  기다린다는 것이다.
+- Future.isDone() → 을 통해서 작업이 완료되었는지 확인 가능하다.
+- Future.invokeAll(Collection) → 통해서 동시에 모든 작업을 실행한다. 순서는 유지된다.
+
+    ```java
+    List<Future<String>> futures = 
+    executorService.invokeAll(Arrays.asList(hello, java, Kim));
+    
+    for (Future<String> f : futures) {
+        System.out.println("f.get() = " + f.get());
+    }
+    ```
+
+- Future.invokeAny() →하나라도 먼저 응답오면 끝낸다.
+
+### CompletableFuture
+
+- CompletableFuture란? →
+  - 자바8에 들어와서 생긴 인터페이스로 자바에서 비동기 프로그래밍을 가능케하는 인터페이스.
+  - 기존의 Future보다 많이 보완되어 있다.
+  - Future인터페이스를 implements한다.
+  - CompletableFuture는 보통 `new CompletableFuture<>()` 로 생성하는데 쓰레드풀 대신 ForkJoinPool을 사용해서 비동기 처리한다.(기본은 ForkJoinPool.commonPool()))
+- CompletableFuture로 가능한것들(Future로는 불가능)
+  - Future를 외부에서 완료시킬 수 없다. 취소하거나 타임아웃은 가능하다.
+  - CompletableFuture는 complete()로 외부에서 완료시킬 수 있다.
+
+    ```java
+    CompletableFuture<String> future = new CompletableFuture<>();
+    future.complete("Kim");
+    ```
+
+  - Future는 블로킹코드인 get()을 사용하지 않고서는 작업이 끝났을때 콜백을 실행할 수 없다.
+  - Future는 여러 Future를 조합할 수 없다.
+  - Future는 예외처리 API를 제공하지 않는다.
+- 비동기로 작업 실행하기
+  - 리턴값이 없는 경우 → runAsync()
+
+    ```java
+    CompletableFuture<Void> future1 = CompletableFuture.runAsync(() -> {
+        System.out.println("Hello  " + Thread.currentThread().getName());
+    });
+    future1.get();
+    ```
+
+  - 리턴값이 있는 경우 → supplyAsync()
+
+    ```java
+    CompletableFuture<String> future2 = CompletableFuture.supplyAsync(() -> {
+          System.out.println("Hello " + Thread.currentThread().getName());
+          return "Hello";
+      })
+    
+    System.out.println(future2.get());
+    ```
+
+- CompletableFuture은 여러 콜백함수를 제공한다.
+  - thenApply(Function) → 리턴값을 받아서 다른 값으로 바꾸는 콜백이다.
+
+    ```java
+    CompletableFuture<String> future3 = CompletableFuture.supplyAsync(() -> {
+          System.out.println("Hello " + Thread.currentThread().getName());
+          return "Hello";
+      }).thenApply((s)->{
+          return s.toUpperCase();
+      });
+      
+      System.out.println(future2.get());
+    ```
+
+  - thenAccept(Consumer) → 리턴값을 또 다른 작업을 처리하는 콜백(리턴없다.)
+
+    ```java
+    CompletableFuture<Void> future4 = CompletableFuture.supplyAsync(() -> {
+            System.out.println("Hello3 " + Thread.currentThread().getName());
+            return "Hello3";
+        }).thenAccept((s)->{
+            System.out.println(s.toUpperCase());
+        });
+    ```
+
+  - thenRun(Runnable) → 리턴값을 받지 않고 다른 작업을 한다. Runnable을 매개변수로 받는다.
+- CompletableFuture은 조합 기능도 제공한다.
+  - theCompose() → 두 작업이 서로 이어서 실행하도록 조합한다.
+
+    ```java
+    CompletableFuture<String> future = hello.thenCompose(App::getWorld);
+    System.out.println(future.get());
+    ```
+
+  - theCombine() → 두 작업을 독립적으로 실행하고 둘 다 종료 했을 때 콜백 실행한다.
+
+    ```java
+    CompletableFuture<String> future1 = hello.thenCombine(world, (h, w) -> {
+      return h + " " + w;
+    });
+    System.out.println("future1 = " + future1.get());
+    ```
+
+  - allOf() → 여러 작업을 모두 실행하고 모든 작업 결과에 콜백 실행한다.
+
+    ```java
+    CompletableFuture<Void> future2 
+    = CompletableFuture.allOf(hello, world).thenAccept(System.out::println);
+    System.out.println("future2 = " + future2.get());
+    ```
+
+  - anyOf() → 여러작업중에가장빨리끝난하나의결과에콜백실행한다.
+
+    ```java
+    CompletableFuture<Void> future3 = CompletableFuture.anyOf(hello, world, world2).thenAccept(System.out::println);
+    future3.get();
+    ```
+
+- CompletableFuture은 예외처리 기능을 제공한다.
+  - `exceptionally`(error) 함수로 제공한다.
+
+    ```java
+    CompletableFuture<String> exceptionally = CompletableFuture.supplyAsync(() -> {
+        if (throwError) {
+            throw new IllegalArgumentException();
+        }
+        System.out.println("Hello " + Thread.currentThread().getName());
+        return "Hello";
+    }).exceptionally(ex -> {
+        System.out.println(ex);
+        return "Error";
+    });
+    ```
+
+  - handle(result, error) → 통해서 정상값과 에러 메시지 전부를 매개변수로 받는다.
+
+    ```java
+    CompletableFuture<String> exceptionally2 = CompletableFuture.supplyAsync(() -> {
+      if (throwError) {
+        throw new IllegalArgumentException();
+      }
+      System.out.println("Hello " + Thread.currentThread().getName());
+      return "Hello";
+    }).handle((result, ex) -> {
+      if (ex != null) {
+        System.out.println(ex);
+        return "ERROR";
+      }
+      return result;
+    });
+    ```
